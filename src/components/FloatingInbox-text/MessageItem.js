@@ -40,12 +40,12 @@ export const MessageItem = ({message, senderAddress}) => {
 
 const styles = StyleSheet.create({
   senderMessage: {
-    alignSelf: 'flex-start',
-    textAlign: 'left',
-  },
-  receiverMessage: {
     alignSelf: 'flex-end',
     textAlign: 'right',
+  },
+  receiverMessage: {
+    alignSelf: 'flex-start',
+    textAlign: 'left',
   },
   messageContent: {
     backgroundColor: 'lightblue',

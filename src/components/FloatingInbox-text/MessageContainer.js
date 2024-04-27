@@ -81,6 +81,7 @@ export const MessageContainer = ({
     const unsubscribe = conversation.streamMessages(handleMessage);
     return () => {
       console.log('Unsubscribing from message stream');
+      unsubscribe();
       // call unsubscribe(); if you want to cancel the stream when the component is unmounted
     };
   }, []);

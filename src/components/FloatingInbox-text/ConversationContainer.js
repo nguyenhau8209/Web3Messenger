@@ -4,7 +4,6 @@ import {MessageContainer} from './MessageContainer';
 import {ListConversations} from './ListConversations';
 import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
 import {useXmtp} from '@xmtp/react-native-sdk';
-
 const styles = StyleSheet.create({
   conversations: {
     height: '100%',
@@ -84,7 +83,8 @@ export const ConversationContainer = ({
   const [canMessage, setCanMessage] = useState(false);
   const [conversationFound, setConversationFound] = useState(false);
   const [createNew, setCreateNew] = useState(false);
-
+  const [address, setAddress] = useState(null);
+  console.log('client ', client);
   const openConversation = async conversation => {
     console.log('selectConversation', conversation.peerAddress);
     setSelectedConversation(conversation);
@@ -121,6 +121,7 @@ export const ConversationContainer = ({
       resolvedAddress,
       isValidEthereumAddress(resolvedAddress),
     );
+    setAddress(resolvedAddress);
     if (resolvedAddress && isValidEthereumAddress(resolvedAddress)) {
       processEthereumAddress(resolvedAddress);
       setSearchTerm(resolvedAddress); // <-- Add this line
@@ -161,6 +162,15 @@ export const ConversationContainer = ({
       </View>
     );
   }
+  const handleCreateNewMessage = async ({address}) => {
+    console.log('vaoooooo');
+    console.log('peerAddress ', address);
+    const newConversation = await client.conversations.newConversation(
+      '0x32f255F54C6c62508Ab106bB9c0f9a414e8AF42f',
+    );
+    console.log('newConversation ', newConversation);
+    return newConversation;
+  };
   return (
     <>
       {!selectedConversation && (
@@ -187,9 +197,7 @@ export const ConversationContainer = ({
             <Button
               title="Create new conversation"
               style={styles.createNewButton}
-              onPress={() => {
-                setSelectedConversation({messages: []});
-              }}
+              onPress={async () => await handleCreateNewMessage(address)}
             />
           )}
         </View>
