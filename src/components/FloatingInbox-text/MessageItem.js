@@ -4,10 +4,13 @@ import {useXmtp} from '@xmtp/react-native-sdk';
 
 export const MessageItem = ({message, senderAddress}) => {
   const {client} = useXmtp();
-  console.log('vaooo message item');
   const renderMessage = () => {
+    console.log(message);
     try {
-      if (message?.content().length > 0) {
+      if (message?.contentType.sameAs(ContentTypeReaction)) {
+        var reaction = message.content;
+        return <Text>{reaction.content}</Text>;
+      } else if (message?.content().length > 0) {
         return <Text>{message?.content()}</Text>;
       }
     } catch {
@@ -40,11 +43,11 @@ export const MessageItem = ({message, senderAddress}) => {
 
 const styles = StyleSheet.create({
   senderMessage: {
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     textAlign: 'left',
   },
   receiverMessage: {
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
     textAlign: 'right',
   },
   messageContent: {

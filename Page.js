@@ -1,9 +1,10 @@
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
 import {useWeb3Modal} from '@web3modal/wagmi-react-native';
 import {useAccount, useWalletClient} from 'wagmi';
 import {disconnect} from 'wagmi/actions';
 import FloatingInbox from './src/components/FloatingInbox-text/Home.js';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const Page = () => {
   const {open} = useWeb3Modal();
@@ -22,13 +23,14 @@ const Page = () => {
   return (
     <View style={{flex: 1}}>
       {isDisconnected && (
-        <View>
-          <Button
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <TouchableOpacity
+            style={{backgroundColor: '#1ea0fc', padding: 10, borderRadius: 10}}
             onPress={() => {
               open();
-            }}
-            title="Open Connect Modal"
-          />
+            }}>
+            <Text style={{color: 'white'}}>Open Connect Modal</Text>
+          </TouchableOpacity>
         </View>
       )}
       {!isDisconnected && walletClient && (
