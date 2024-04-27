@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import {MessageInput} from './MessageInput';
 import {MessageItem} from './MessageItem';
 import {useXmtp} from '@xmtp/react-native-sdk';
-import {View, Text, ScrollView, Alert, StyleSheet} from 'react-native';
+import {View, Text, ScrollView, Alert, StyleSheet, Button} from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -25,7 +25,8 @@ export const MessageContainer = ({
 
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showPopup, setShowPopup] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(false);
   const updateMessages = (prevMessages, newMessage) => {
     const doesMessageExist = prevMessages.some(
       existingMessage => existingMessage.id === newMessage.id,
@@ -39,12 +40,17 @@ export const MessageContainer = ({
   };
 
   useEffect(() => {
+    let stream;
     let isMounted = true;
     let timer;
     const fetchMessages = async () => {
       if (conversation && conversation.peerAddress && isFirstLoad.current) {
         setIsLoading(true);
         const initialMessages = await conversation?.messages();
+
+        //Consent state
+        const consentState = await conversation.consentState();
+        setShowPopup(consentState === 'unknown');
         const orderedMessages = initialMessages.reverse();
         let updatedMessages = [];
         orderedMessages.forEach(message => {
@@ -68,6 +74,7 @@ export const MessageContainer = ({
     return () => {
       isMounted = false;
       clearTimeout(timer);
+      if (stream) stream.return();
     };
   }, [conversation]);
 
@@ -106,6 +113,49 @@ export const MessageContainer = ({
     }
   };
 
+  //Function to handle the aceptance of a contact
+  const handleAcept = async () => {
+    //Allow the contact
+    await client.contacts.allow([conversation.peerAddress]);
+    //Hide the popup
+    setShowPopup(false);
+    //Refesh the consent list
+    await client.contacts.refreshConsentList();
+    //Log the aceptance
+    console.log('acepted ', conversation.peerAddress);
+  };
+
+  //Function to handle block of a contact
+  const handleBlock = async () => {
+    //Block the contact
+    await client.contacts.deny([conversation.peerAddress]);
+    //Hide the popup
+    setShowPopup(false);
+    //Refesh the consent list
+    await client.contacts.refreshConsentList();
+    //Set blocked
+    setIsBlocked(true);
+    //Log the blocking
+    console.log('Denied ', conversation.peerAddress);
+  };
+  const functionReturnBlock = async () => {
+    const state = await conversation.consentState();
+
+    if (state === 'denied') {
+      return (
+        <View style={{alignItems: 'center', marginBottom: 10}}>
+          <Text>This account is denied!</Text>
+        </View>
+      );
+    }
+    return (
+      <MessageInput
+        onSendMessage={msg => {
+          handleSendMessage(msg);
+        }}
+      />
+    );
+  };
   return (
     <>
       {isLoading ? (
@@ -125,11 +175,26 @@ export const MessageContainer = ({
               );
             })}
           </ScrollView>
-          <MessageInput
-            onSendMessage={msg => {
-              handleSendMessage(msg);
-            }}
-          />
+          {showPopup ? (
+            <View style={styles.popup}>
+              <Text style={styles.popupTitle}>Do you trust this contact?</Text>
+              <View style={styles.popupInner}>
+                <Button
+                  title="Accept"
+                  style={{...styles.popupButton, ...styles.acceptButton}}
+                  onPress={handleAcept}
+                />
+                <Button
+                  title="Block"
+                  style={{...styles.popupButton, ...styles.blockButton}}
+                  onPress={handleBlock}
+                  color="red"
+                />
+              </View>
+            </View>
+          ) : (
+            functionReturnBlock()
+          )}
         </View>
       )}
     </>
