@@ -83,7 +83,7 @@ export const ConversationContainer = ({
   const [canMessage, setCanMessage] = useState(false);
   const [conversationFound, setConversationFound] = useState(false);
   const [createNew, setCreateNew] = useState(false);
-  const [address, setAddress] = useState(null);
+  const [addressInput, setAddress] = useState(null);
   console.log('client ', client);
   const openConversation = async conversation => {
     console.log('selectConversation', conversation.peerAddress);
@@ -132,7 +132,7 @@ export const ConversationContainer = ({
       //setCanMessage(false);
     }
   };
-
+  console.log('address ', addressInput);
   const processEthereumAddress = async address => {
     setPeerAddress(address);
     if (address === client.address) {
@@ -162,14 +162,18 @@ export const ConversationContainer = ({
       </View>
     );
   }
-  const handleCreateNewMessage = async ({address}) => {
+  const handleCreateNewMessage = async ({addressInput}) => {
     console.log('vaoooooo');
-    console.log('peerAddress ', address);
-    const newConversation = await client.conversations.newConversation(
-      '0x32f255F54C6c62508Ab106bB9c0f9a414e8AF42f',
-    );
-    console.log('newConversation ', newConversation);
-    return newConversation;
+    console.log('address in handle create', addressInput);
+    //
+    if (addressInput) {
+      const newConversation = await client.conversations.newConversation(
+        addressInput,
+      );
+      console.log('newConversation ', newConversation);
+      return newConversation;
+    }
+    return console.log('address is undefineded');
   };
   return (
     <>
@@ -197,7 +201,7 @@ export const ConversationContainer = ({
             <Button
               title="Create new conversation"
               style={styles.createNewButton}
-              onPress={async () => await handleCreateNewMessage(address)}
+              onPress={() => handleCreateNewMessage({addressInput})}
             />
           )}
         </View>
