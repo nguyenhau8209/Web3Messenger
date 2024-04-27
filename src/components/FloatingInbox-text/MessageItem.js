@@ -24,7 +24,12 @@ export const MessageItem = ({message, senderAddress}) => {
     <View
       style={isSender ? styles.senderMessage : styles.receiverMessage}
       key={message.id}>
-      <View style={styles.messageContent}>
+      <View
+        style={
+          isSender
+            ? styles.messageContentSeerder
+            : styles.messageContentReceived
+        }>
         {renderMessage()}
         <View style={styles.footer}>
           <Text style={styles.timeStamp}>
@@ -47,8 +52,16 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     textAlign: 'left',
   },
-  messageContent: {
+  messageContentSeerder: {
     backgroundColor: 'lightblue',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    maxWidth: '80%',
+  },
+  messageContentReceived: {
+    backgroundColor: '#C0C0C0',
+    color: 'black',
     padding: 10,
     margin: 5,
     borderRadius: 5,

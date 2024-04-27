@@ -198,6 +198,7 @@ export function FloatingInboxXMTP({isPWA = false, wallet, env, onLogout}) {
     }
   };
   const initXmtpWithKeys = async function () {
+    console.log('vaoooo');
     try {
       if (!signer) {
         handleLogout();
@@ -211,7 +212,9 @@ export function FloatingInboxXMTP({isPWA = false, wallet, env, onLogout}) {
 
       let keys = await loadKeyBundle(address);
       if (!keys) {
+        console.log('vaooo !key');
         const xmtp = await Client.create(signer, clientOptions);
+        console.log(xmtp);
         setClient(xmtp);
         keys = await xmtp.exportKeyBundle(xmtp.address);
         storeKeyBundle(xmtp.address, keys);
