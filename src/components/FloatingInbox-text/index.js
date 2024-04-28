@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Client, useXmtp} from '@xmtp/react-native-sdk';
+import {Client, ReactionCodec, useXmtp} from '@xmtp/react-native-sdk';
 import {ethers} from 'ethers';
 import {ConversationContainer} from './ConversationContainer';
 import {View, Text, Button, StyleSheet, TouchableOpacity} from 'react-native';
@@ -206,6 +206,7 @@ export function FloatingInboxXMTP({isPWA = false, wallet, env, onLogout}) {
       }
       const clientOptions = {
         env: env ? env : getEnv(),
+        codecs: [new ReactionCodec()],
       };
 
       let address = await getAddress(signer);
